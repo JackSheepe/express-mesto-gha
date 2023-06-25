@@ -23,6 +23,7 @@ module.exports.getUserById = (req, res) => {
   }
 
   return User.findOne({ _id: userId })
+    .select("-__v")
     .then((user) => {
       if (!user) {
         return res
