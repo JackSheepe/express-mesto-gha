@@ -22,16 +22,23 @@ module.exports.getUserById = (req, res) => {
     return res.status(400).json({ message: "Неверный формат _id" });
   }
 
-  return User.findById(userId)
+  console.log("Before findOne");
+
+  return User.findOne({ _id: userId })
     .then((user) => {
+      console.log("After findOne");
+      console.log("User:", user);
+
       if (!user) {
         return res
           .status(404)
           .json({ message: "Пользователь по указанному _id не найден" });
       }
+
       return res.status(200).json({ message: "Success", user });
     })
     .catch((err) => {
+      console.log("Error:", err);
       res.status(500).send({ error: err.message });
     });
 };
@@ -40,6 +47,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
+    .select("-_id")
     .then((user) => {
       const userData = {
         name: user.name,
