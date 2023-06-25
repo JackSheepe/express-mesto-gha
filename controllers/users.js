@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send({ message: "Success", users }))
+    .then((users) => res.status(200).send(users))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res
@@ -22,7 +22,7 @@ module.exports.getUserById = (req, res) => {
     return res.status(400).json({ message: "Неверный формат _id" });
   }
 
-  return User.findById(userId)
+  return User.findOne({ _id: userId })
     .then((user) => {
       if (!user) {
         return res
@@ -46,7 +46,7 @@ module.exports.createUser = (req, res) => {
         about: user.about,
         avatar: user.avatar,
       };
-      res.send({ message: "Success", userData });
+      res.send(userData);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -77,7 +77,7 @@ module.exports.updateProfile = (req, res) => {
         name: user.name,
         about: user.about,
       };
-      return res.status(200).json({ message: "Success", userData });
+      return res.status(200).json(userData);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -106,7 +106,7 @@ module.exports.updateAvatar = (req, res) => {
       const userData = {
         avatar: user.avatar,
       };
-      return res.status(200).json({ message: "Success", userData });
+      return res.status(200).json(userData);
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
