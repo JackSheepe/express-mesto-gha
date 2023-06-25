@@ -32,7 +32,7 @@ module.exports.getUserById = (req, res) => {
 
       const user = users[0];
 
-      return res.status(200).json({ message: "Success", user, userId });
+      return res.status(200).json(user);
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
