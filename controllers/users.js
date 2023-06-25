@@ -1,3 +1,5 @@
+const { isValidObjectId } = require("mongoose");
+
 const User = require("../models/user");
 
 module.exports.getAllUsers = (req, res) => {
@@ -15,11 +17,16 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) {
+    return res.status(400).json({ message: "Неверный формат _id" });
+  }
+
   return User.findById(userId)
     .then((user) => {
       if (!user) {
         return res
-          .status(400)
+          .status(404)
           .json({ message: "Пользователь по указанному _id не найден" });
       }
       return res.status(200).json({ message: "Success", user });
@@ -33,7 +40,10 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ message: "Success", user }))
+    .then((user) => {
+      const { _id, ...userData } = user.doc;
+      res.send({ message: "Success", userData });
+    })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res
@@ -56,13 +66,19 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(400)
+          .status(404)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      return res.status(200).json({ message: "Success", user });
+      const { _id, avatar, ...userData } = user.doc;
+      return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
-      res.status(500).send({ error: err.message });
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Переданы некорректные данные" });
+      }
+      return res.status(500).send({ error: err.message });
     });
 };
 
@@ -77,10 +93,13 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(400)
+          .status(404)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      return res.status(200).json({ message: "Success", user });
+      const {
+        _id, name, about, ...userData
+      } = user.doc;
+      return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
