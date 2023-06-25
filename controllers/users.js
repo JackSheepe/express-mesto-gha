@@ -41,7 +41,7 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      const { _id, ...userData } = user.doc;
+      const { _id, ...userData } = user._doc;
       res.send({ message: "Success", userData });
     })
     .catch((err) => {
@@ -69,7 +69,7 @@ module.exports.updateProfile = (req, res) => {
           .status(404)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      const { _id, avatar, ...userData } = user.doc;
+      const { _id, avatar, ...userData } = user._doc;
       return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
@@ -98,7 +98,7 @@ module.exports.updateAvatar = (req, res) => {
       }
       const {
         _id, name, about, ...userData
-      } = user.doc;
+      } = user._doc;
       return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
