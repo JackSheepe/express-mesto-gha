@@ -41,7 +41,11 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      const { _id, ...userData } = user._doc;
+      const userData = {
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      };
       res.send({ message: "Success", userData });
     })
     .catch((err) => {
@@ -69,7 +73,10 @@ module.exports.updateProfile = (req, res) => {
           .status(404)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      const { _id, avatar, ...userData } = user._doc;
+      const userData = {
+        name: user.name,
+        about: user.about,
+      };
       return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
@@ -96,9 +103,9 @@ module.exports.updateAvatar = (req, res) => {
           .status(404)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      const {
-        _id, name, about, ...userData
-      } = user._doc;
+      const userData = {
+        avatar: user.avatar,
+      };
       return res.status(200).json({ message: "Success", userData });
     })
     .catch((err) => {
