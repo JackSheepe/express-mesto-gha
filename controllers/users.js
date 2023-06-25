@@ -22,8 +22,7 @@ module.exports.getUserById = (req, res) => {
     return res.status(400).json({ message: "Неверный формат _id" });
   }
 
-  return User.findOne({ _id: userId })
-    .select("-__v")
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         return res
