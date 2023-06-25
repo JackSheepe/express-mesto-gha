@@ -3,15 +3,26 @@ const { isValidObjectId } = require("mongoose");
 const User = require("../models/user");
 
 module.exports.getAllUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
+  const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) {
+    return res.status(400).json({ message: "Неверный формат _id" });
+  }
+
+  return User.find({ _id: userId })
+    .then((users) => {
+      if (users.length === 0) {
         return res
-          .status(401)
-          .send({ message: "Переданы некорректные данные", error: err.message });
+          .status(404)
+          .json({ message: "Пользователь по указанному _id не найден" });
       }
-      return res.status(500).send({ message: "Server Error", error: err.message });
+
+      const user = users[0];
+
+      return res.status(200).json({ message: "Success", user, userId });
+    })
+    .catch((err) => {
+      res.status(500).send({ error: err.message });
     });
 };
 
