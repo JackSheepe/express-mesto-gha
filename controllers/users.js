@@ -2,7 +2,7 @@ const User = require("../models/user");
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ message: "Success", data: users }))
+    .then((users) => res.status(200).send({ message: "Success", users }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res
@@ -19,10 +19,10 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(404)
+          .status(400)
           .json({ message: "Пользователь по указанному _id не найден" });
       }
-      return res.status(200).json(user);
+      return res.status(200).json({ message: "Success", user });
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
@@ -33,7 +33,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send(user))
+    .then((user) => res.send({ message: "Success", user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res
@@ -56,10 +56,10 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(404)
+          .status(400)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      return res.status(200).json(user);
+      return res.status(200).json({ message: "Success", user });
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
@@ -77,10 +77,10 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(404)
+          .status(400)
           .json({ message: "Пользователь с указанным _id не найден" });
       }
-      return res.status(200).json(user);
+      return res.status(200).json({ message: "Success", user });
     })
     .catch((err) => {
       res.status(500).send({ error: err.message });
