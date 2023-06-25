@@ -3,7 +3,14 @@ const User = require("../models/user");
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(401).send({ message: "Произошла ошибка" }));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Переданы некорректные данные" });
+      }
+      return res.status(500).send({ error: err.message });
+    });
 };
 
 module.exports.getUserById = (req, res) => {
@@ -12,14 +19,13 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(400)
-          .json({ message: "Запрашиваемый пользователь не найден" });
+          .status(404)
+          .json({ message: "Пользователь по указанному _id не найден" });
       }
       return res.status(200).json(user);
     })
-    .catch((error) => {
-      res.status(500).send({ message: "Произошла ошибка" });
-      throw error;
+    .catch((err) => {
+      res.status(500).send({ error: err.message });
     });
 };
 
@@ -34,26 +40,49 @@ module.exports.createUser = (req, res) => {
           .status(400)
           .send({ message: "Переданы некорректные данные" });
       }
-      return res.status(500).send({ message: "Произошла ошибка" });
+      return res.status(500).send({ error: err.message });
     });
 };
 
 module.exports.updateProfile = (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.send(users);
+  const { name, about } = req.body;
+  const userId = req.user._id;
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, about },
+    { new: true, runValidators: true },
+  )
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "Пользователь с указанным _id не найден" });
+      }
+      return res.status(200).json(user);
     })
     .catch((err) => {
-      res.status(500).send({ message: err });
+      res.status(500).send({ error: err.message });
     });
 };
 
 module.exports.updateAvatar = (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.send(users);
+  const { avatar } = req.body;
+  const userId = req.user._id;
+  User.findByIdAndUpdate(
+    userId,
+    { avatar },
+    { new: true, runValidators: true },
+  )
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "Пользователь с указанным _id не найден" });
+      }
+      return res.status(200).json(user);
     })
     .catch((err) => {
-      res.status(500).send({ message: err });
+      res.status(500).send({ error: err.message });
     });
 };
