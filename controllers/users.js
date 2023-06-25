@@ -2,14 +2,14 @@ const User = require("../models/user");
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.send({ message: "Success", data: users }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res
-          .status(400)
-          .send({ message: "Переданы некорректные данные" });
+          .status(401)
+          .send({ message: "Переданы некорректные данные", error: err.message });
       }
-      return res.status(500).send({ error: err.message });
+      return res.status(500).send({ message: "Server Error", error: err.message });
     });
 };
 
