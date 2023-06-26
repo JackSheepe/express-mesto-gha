@@ -22,7 +22,7 @@ module.exports.getUserById = (req, res) => {
     return res.status(400).json({ message: "Неверный формат _id" });
   }
 
-  return User.find({ _id: userId })
+  return User.findById(userId)
     .then((users) => {
       if (users.length === 0) {
         return res
@@ -50,7 +50,7 @@ module.exports.createUser = (req, res) => {
         avatar: user.avatar,
         _id: user._id,
       };
-      res.send(userData);
+      res.status(201).send(userData);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -71,12 +71,8 @@ module.exports.updateProfile = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   )
+    .onFail(new Error("NotValidId"))
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: "Пользователь с указанным _id не найден" });
-      }
       const userData = {
         name: user.name,
         about: user.about,
@@ -84,6 +80,11 @@ module.exports.updateProfile = (req, res) => {
       return res.status(200).json(userData);
     })
     .catch((err) => {
+      if (err.message === "NotValidId") {
+        return res
+          .status(404)
+          .json({ message: "Пользователь с указанным _id не найден" });
+      }
       if (err.name === "ValidationError") {
         return res
           .status(400)
@@ -113,6 +114,11 @@ module.exports.updateAvatar = (req, res) => {
       return res.status(200).json(userData);
     })
     .catch((err) => {
-      res.status(500).send({ error: err.message });
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Переданы некорректные данные" });
+      }
+      return res.status(500).send({ error: err.message });
     });
 };
