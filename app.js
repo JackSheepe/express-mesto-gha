@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
+const { errors } = require("celebrate");
 const { errorHandler } = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
 const {
@@ -27,6 +28,7 @@ app.use(auth);
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
