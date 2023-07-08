@@ -25,7 +25,9 @@ module.exports.deleteCard = (req, res, next) => {
         res.send({ message: "Карточка удалена" });
       }
     })
-    .catch(next);
+    .catch((error) => {
+      next(error);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -43,4 +45,25 @@ module.exports.likeCard = (req, res, next) => {
       }
     })
     .catch(next);
+};
+
+module.exports.dislikeCard = (req, res, next) => {
+  const { cardId } = req.params;
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((updatedCard) => {
+      if (!updatedCard) {
+        throw new CustomError(404, "Передан несуществующий _id карточки");
+      }
+      return res.send(updatedCard);
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        throw new CustomError(400, "Переданы некорректные данные для снятия лайка");
+      }
+      next(err);
+    });
 };
