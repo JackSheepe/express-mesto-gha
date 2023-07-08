@@ -1,8 +1,7 @@
 class CustomError extends Error {
   constructor(statusCode, message) {
-    super();
+    super(message);
     this.statusCode = statusCode;
-    this.message = message;
   }
 }
 
@@ -22,8 +21,10 @@ const errorHandler = (err, req, res, next) => {
   }
 
   res.status(customError.statusCode || 500).json({
-    message: customError.message || "Server Error",
+    message: "Server Error",
   });
+
+  console.error(customError);
 };
 
 module.exports = {

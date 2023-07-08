@@ -16,13 +16,10 @@ const userIdSchema = Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required();
 const userUpdateSchema = Joi.object().keys({
   name: Joi.string().min(2).max(30),
   about: Joi.string().min(2).max(30),
-  avatar: Joi.string().uri(),
-  email: Joi.string().email(),
-  password: Joi.string().required(),
 });
 
 const avatarUpdateSchema = Joi.object().keys({
-  avatar: Joi.string().uri().required(),
+  avatar: Joi.string().pattern(/^https?:\/\/\w+(\.\w+)*(:\d+)?(\/.*)?$/).required(),
 });
 
 router.get("/", getAllUsers);

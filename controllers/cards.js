@@ -62,7 +62,8 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        throw new CustomError(400, "Переданы некорректные данные для снятия лайка");
+        const customError = new CustomError(400, "Переданы некорректные данные для снятия лайка");
+        return Promise.reject(customError);
       }
       next(err);
     });

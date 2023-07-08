@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/JackSheepe/express-mesto-gha.git"
   },
-  "author": "",
+  "author": "Vladimir Teterkin",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/JackSheepe/express-mesto-gha/issues"

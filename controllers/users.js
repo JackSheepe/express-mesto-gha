@@ -14,7 +14,8 @@ module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
 
   if (!isValidObjectId(userId)) {
-    throw new CustomError(400, "Неверный формат _id");
+    const customError = new CustomError(400, "Неверный формат _id");
+    return Promise.reject(customError);
   }
 
   return User.findById(userId)
