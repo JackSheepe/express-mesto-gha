@@ -1,7 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const helmet = require('helmet');
+const helmet = require("helmet");
+const { errorHandler } = require("./middlewares/errorHandler");
+const auth = require("./middlewares/auth");
+const {
+  login,
+  createUser,
+} = require("./controllers/users");
 
 const app = express();
 app.use(helmet());
@@ -13,16 +19,15 @@ mongoose.connect("mongodb://127.0.0.1:27017/mestodb", {
   useUnifiedTopology: true,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "649842d108f7ee6223ce4387",
-  };
+app.post("/signin", login);
+app.post("/signup", createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log("Server started on port 3000");
