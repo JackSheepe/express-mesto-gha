@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { celebrate, Joi } = require("celebrate");
+const { celebrate, Joi, Segments } = require("celebrate");
 const {
   getAllCards,
   createCard,
@@ -17,6 +17,12 @@ const cardCreateSchema = Joi.object().keys({
   link: Joi.string().pattern(/^https?:\/\/\w+(\.\w+)*(:\d+)?(\/.*)?$/).required(),
 });
 
+const cardIdValidator = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().required().length(24).hex(),
+  }),
+});
+
 router.get("/", getAllCards);
 
 router.post("/", celebrate({
@@ -29,8 +35,8 @@ router.delete("/:cardId", celebrate({
   }),
 }), deleteCard);
 
-router.put("/:cardId/likes", likeCard);
+router.put("/:cardId/likes", cardIdValidator, likeCard);
 
-router.delete("/:cardId/likes", dislikeCard);
+router.delete("/:cardId/likes", cardIdValidator, dislikeCard);
 
 module.exports = router;

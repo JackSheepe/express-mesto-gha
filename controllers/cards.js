@@ -17,13 +17,25 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
-    .then((deletedCard) => {
-      if (!deletedCard) {
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
         throw new CustomError(404, "Карточка с указанным _id не найдена");
-      } else {
-        res.send({ message: "Карточка удалена" });
       }
+
+      if (req.user._id.toString() !== card.owner.toString()) {
+        throw new CustomError(
+          403,
+          "Недостаточно прав для выполнения операции",
+        );
+      }
+
+      Card.findByIdAndDelete(cardId)
+        .then((deletedCard) => {
+          res.send({ message: "Карточка удалена" });
+          return deletedCard;
+        })
+        .catch(next);
     })
     .catch((error) => {
       next(error);
@@ -62,9 +74,10 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        const customError = new CustomError(400, "Переданы некорректные данные для снятия лайка");
-        return Promise.reject(customError);
+        next(err);
+        return err;
       }
       next(err);
+      return err;
     });
 };

@@ -28,6 +28,18 @@ app.use(auth);
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
+app.use((req, res, next) => {
+  res.status(404);
+
+  if (req.accepts("html")) {
+    return res.render("404", { url: req.url });
+  }
+  if (req.accepts("json")) {
+    return res.json({ error: "Not found" });
+  }
+  return res.type("txt").send("Not found");
+});
+
 app.use(errors());
 app.use(errorHandler);
 

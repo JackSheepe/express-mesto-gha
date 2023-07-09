@@ -15,7 +15,8 @@ module.exports.getUserById = (req, res, next) => {
 
   if (!isValidObjectId(userId)) {
     const customError = new CustomError(400, "Неверный формат _id");
-    return Promise.reject(customError);
+    next(customError);
+    return customError;
   }
 
   return User.findById(userId)
@@ -105,9 +106,6 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, "6d7a0ce2469313600d7bf16c36f83a4f0a051ca3de3e327da75160cdc3eca245", { expiresIn: "7d" });
-      res.send({
-        token,
-      });
 
       res
         .cookie("jwt", token, {
