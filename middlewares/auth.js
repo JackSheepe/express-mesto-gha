@@ -15,7 +15,10 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, "6d7a0ce2469313600d7bf16c36f83a4f0a051ca3de3e327da75160cdc3eca245");
+    payload = jwt.verify(
+      token,
+      "6d7a0ce2469313600d7bf16c36f83a4f0a051ca3de3e327da75160cdc3eca245",
+    );
   } catch (err) {
     const customError = new CustomError(401, "Токен неверен или истёк срок хранения");
     return next(customError);
