@@ -40,8 +40,6 @@ const loginValidator = celebrate({
 app.post("/signin", createUserValidator, login);
 app.post("/signup", loginValidator, createUser);
 
-app.use(auth);
-
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
