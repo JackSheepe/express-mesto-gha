@@ -66,6 +66,8 @@ module.exports.createUser = (req, res, next) => {
       return res.status(201).send(userData);
     })
     .catch(next);
+
+  return;
 };
 
 module.exports.updateProfile = (req, res, next) => {
