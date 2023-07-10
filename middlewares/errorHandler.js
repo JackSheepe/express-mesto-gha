@@ -21,7 +21,7 @@ const errorHandler = (err, req, res, next) => {
   }
 
   res.status(customError.statusCode || 500).json({
-    message: customError.statusCode ? "Server Error" : customError.message,
+    message: err.message || customError.message || "Server Error",
   });
 
   console.error(err);
