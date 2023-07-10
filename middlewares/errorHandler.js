@@ -8,6 +8,10 @@ class CustomError extends Error {
 const errorHandler = (err, req, res, next) => {
   let customError = { ...err };
 
+  if (err.code === 404) {
+    customError = new CustomError(404, "Not found");
+  }
+
   if (err.code === 11000) {
     customError = new CustomError(409, "Пользователь с таким Email уже существует");
   }
@@ -17,10 +21,12 @@ const errorHandler = (err, req, res, next) => {
   }
 
   res.status(customError.statusCode || 500).json({
-    message: customError.statusCode ? customError.message : "Server Error",
+    message: customError.message || "Server Error",
   });
 
-  console.error(customError);
+  console.error(err);
+
+  next();
 };
 
 module.exports = {

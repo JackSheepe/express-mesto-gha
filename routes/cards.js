@@ -10,8 +10,6 @@ const {
   dislikeCard,
 } = require("../controllers/cards");
 
-const cardIdSchema = Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required();
-
 const cardCreateSchema = Joi.object().keys({
   name: Joi.string().min(2).max(30).required(),
   link: Joi.string().pattern(/^https?:\/\/\w+(\.\w+)*(:\d+)?(\/.*)?$/).required(),
@@ -29,11 +27,7 @@ router.post("/", celebrate({
   body: cardCreateSchema,
 }), createCard);
 
-router.delete("/:cardId", celebrate({
-  params: Joi.object().keys({
-    cardId: cardIdSchema,
-  }),
-}), deleteCard);
+router.delete("/:cardId", cardIdValidator, deleteCard);
 
 router.put("/:cardId/likes", cardIdValidator, likeCard);
 

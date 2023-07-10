@@ -22,6 +22,22 @@ const avatarUpdateSchema = Joi.object().keys({
   avatar: Joi.string().pattern(/^https?:\/\/\w+(\.\w+)*(:\d+)?(\/.*)?$/).required(),
 });
 
+module.exports.createUserValidator = celebrate({
+  body: Joi.object().keys({
+    userUpdateSchema,
+    avatarUpdateSchema,
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+});
+
+module.exports.loginValidator = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+});
+
 router.get("/", getAllUsers);
 
 router.get("/:userId", celebrate({

@@ -74,10 +74,8 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        next(err);
-        return err;
+        return next(err);
       }
-      next(err);
-      return err;
+      return next(err);
     });
 };

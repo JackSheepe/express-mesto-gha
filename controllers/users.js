@@ -1,4 +1,5 @@
 const { isValidObjectId } = require("mongoose");
+const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { CustomError } = require("../middlewares/errorHandler");
@@ -15,8 +16,7 @@ module.exports.getUserById = (req, res, next) => {
 
   if (!isValidObjectId(userId)) {
     const customError = new CustomError(400, "Неверный формат _id");
-    next(customError);
-    return customError;
+    return next(customError);
   }
 
   return User.findById(userId)
@@ -38,6 +38,16 @@ module.exports.createUser = (req, res, next) => {
     password,
   } = req.body;
 
+  if (!validator.isEmail(email)) {
+    const customError = new CustomError(400, "Неверный Email");
+    return next(customError);
+  }
+
+  if (!validator.isLength(password, { min: 8 })) {
+    const customError = new CustomError(400, "Минимум 8 знаков");
+    return next(customError);
+  }
+
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
@@ -53,7 +63,7 @@ module.exports.createUser = (req, res, next) => {
         avatar: user.avatar,
         _id: user._id,
       };
-      res.status(201).send(userData);
+      return res.status(201).send(userData);
     })
     .catch(next);
 };
@@ -103,6 +113,16 @@ module.exports.updateAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
+  if (!validator.isEmail(email)) {
+    const customError = new CustomError(400, "Неверный Email");
+    return next(customError);
+  }
+
+  if (!validator.isLength(password, { min: 8 })) {
+    const customError = new CustomError(400, "Минимум 8 знаков");
+    return next(customError);
+  }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, "6d7a0ce2469313600d7bf16c36f83a4f0a051ca3de3e327da75160cdc3eca245", { expiresIn: "7d" });
@@ -113,7 +133,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         });
-    })
+    }).send("Авторизация прошла успешно!")
     .catch(next);
 };
 

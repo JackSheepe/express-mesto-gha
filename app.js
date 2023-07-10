@@ -3,12 +3,13 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const { errors } = require("celebrate");
-const { errorHandler } = require("./middlewares/errorHandler");
+const { CustomError, errorHandler } = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
 const {
   login,
   createUser,
 } = require("./controllers/users");
+const { createUserValidator, loginValidator } = require("./routes/users");
 
 const app = express();
 app.use(helmet());
@@ -20,8 +21,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/mestodb", {
   useUnifiedTopology: true,
 });
 
-app.post("/signin", login);
-app.post("/signup", createUser);
+app.post("/signin", createUserValidator, login);
+app.post("/signup", loginValidator, createUser);
 
 app.use(auth);
 
@@ -29,15 +30,8 @@ app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
 app.use((req, res, next) => {
-  res.status(404);
-
-  if (req.accepts("html")) {
-    return res.render("404", { url: req.url });
-  }
-  if (req.accepts("json")) {
-    return res.json({ error: "Not found" });
-  }
-  return res.type("txt").send("Not found");
+  const customError = new CustomError(404, "Not found");
+  next(customError);
 });
 
 app.use(errors());
