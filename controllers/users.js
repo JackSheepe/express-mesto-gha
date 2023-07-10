@@ -134,8 +134,9 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
           sameSite: true,
-        });
-    }).send("Авторизация прошла успешно!")
+        })
+        .send("Авторизация прошла успешно!");
+    })
     .catch(next);
 };
 
