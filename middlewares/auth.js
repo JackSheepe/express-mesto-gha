@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    const customError = new CustomError(400, "Необходима авторизация");
+    const customError = new CustomError(401, "Необходима авторизация");
     return next(customError);
   }
 
