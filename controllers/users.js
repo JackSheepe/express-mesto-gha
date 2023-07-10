@@ -67,7 +67,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch(next);
 
-  return;
+  return next();
 };
 
 module.exports.updateProfile = (req, res, next) => {
