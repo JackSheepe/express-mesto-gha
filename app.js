@@ -2,14 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
-const { errors } = require("celebrate");
+const { celebrate, Joi, errors } = require("celebrate");
 const { CustomError, errorHandler } = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
 const {
   login,
   createUser,
 } = require("./controllers/users");
-const { createUserValidator, loginValidator } = require("./routes/users");
 
 const app = express();
 app.use(helmet());
@@ -19,6 +18,23 @@ const { PORT = 3000 } = process.env;
 mongoose.connect("mongodb://127.0.0.1:27017/mestodb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+});
+
+const createUserValidator = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    about: Joi.string().min(2).max(30).required(),
+    avatar: Joi.string().pattern(/^https?:\/\/\w+(\.\w+)*(:\d+)?(\/.*)?$/).required(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+});
+
+const loginValidator = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
 });
 
 app.post("/signin", createUserValidator, login);
