@@ -1,5 +1,4 @@
 const { isValidObjectId } = require("mongoose");
-const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { CustomError } = require("../middlewares/errorHandler");
@@ -37,16 +36,6 @@ module.exports.createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-
-  if (!validator.isEmail(email)) {
-    const customError = new CustomError(400, "Неверный Email");
-    return next(customError);
-  }
-
-  if (!validator.isLength(password, { min: 8 })) {
-    const customError = new CustomError(400, "Минимум 8 знаков");
-    return next(customError);
-  }
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -114,16 +103,6 @@ module.exports.updateAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
-  if (!validator.isEmail(email)) {
-    const customError = new CustomError(400, "Неверный Email");
-    return next(customError);
-  }
-
-  if (!validator.isLength(password, { min: 8 })) {
-    const customError = new CustomError(400, "Минимум 8 знаков");
-    return next(customError);
-  }
 
   return User.findUserByCredentials(email, password)
     .then((user) => {

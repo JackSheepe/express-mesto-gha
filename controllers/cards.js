@@ -33,7 +33,6 @@ module.exports.deleteCard = (req, res, next) => {
       Card.findByIdAndDelete(cardId)
         .then((deletedCard) => {
           res.send({ message: "Карточка удалена" });
-          return deletedCard;
         })
         .catch(next);
     })
