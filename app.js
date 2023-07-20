@@ -9,6 +9,7 @@ const {
   login,
   createUser,
 } = require("./controllers/users");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 app.use(helmet());
@@ -37,6 +38,8 @@ const loginValidator = celebrate({
   }),
 });
 
+app.use(requestLogger);
+
 app.post("/signin", createUserValidator, login);
 app.post("/signup", loginValidator, createUser);
 
@@ -44,6 +47,8 @@ app.use(auth);
 
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
+
+app.use(errorLogger);
 
 app.use((req, res, next) => {
   const customError = new CustomError(404, "Not found");
